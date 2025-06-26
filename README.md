@@ -158,14 +158,14 @@ The basic configuration of the docker image:
 		*	The crypto functions are listed in the file at `(root)/scripts/crypto_func_lst.out`
 	*	REF: **x64_nginx1240_gcc114_O3**
 	```bash
-  # only process the 34 crypto functions, time consumption: within 5 seconds
-  $ python3 scripts/emulate_binary.py --static x64_libcrypto111f_gcc114_O3 --crypto
-  # time consumption: around 40 minutes
-  $ python3 scripts/emulate_binary.py --static x64_nginx1240_gcc114_O3 --general
-  # time consumption: around 15 seconds
-  $ python3 scripts/compare_binaries.py --target x64_libcrypto111f_gcc114_O3 --reference x64_nginx1240_gcc114_O3
-  ```
-    *  The results are consistent with those in **Table 5** on **Page 20** of the paper.
+        # only process the 34 crypto functions, time consumption: within 5 seconds
+        $ python3 scripts/emulate_binary.py --static x64_libcrypto111f_gcc114_O3 --crypto
+        # time consumption: around 40 minutes
+        $ python3 scripts/emulate_binary.py --static x64_nginx1240_gcc114_O3 --general
+        # time consumption: around 15 seconds
+        $ python3 scripts/compare_binaries.py --target x64_libcrypto111f_gcc114_O3 --reference x64_nginx1240_gcc114_O3
+        ```
+*  The results are consistent with those in **Table 5** on **Page 20** of the paper.
 
 ##### 1.3 Application: Cross-Library Analysis
 *	Identify functions that implement the same cryptographic algorithms.
@@ -231,7 +231,7 @@ The basic configuration of the docker image:
 	$ python3 scripts/compare_binaries.py --target x64_libcrypto111f_gcc114_O0 --reference revil
 	```
 *	The AES encryption function is correctly matched with the one at `0x40f35e` of REvil with the highest score of the results (on the first line).
-	```
+	```bash
 	# check the AES function found in revil
 	$ cat ./output/x64_libcrypto111f_gcc114_O0_vs_revil/log/AES_encrypt.txt | head
 	```
