@@ -28,7 +28,7 @@
 |    |    |--- emulation                    # to generally emulate one binary for code features
 |    |    |--- emulation_cross              # to emulate one binary for cross-library analysis
 |    |    |--- comparison                   # to generally compare two binaries for similarity scores
-|    |    |--- comparison                   # to compare binaries for cross-library analysis
+|    |    |--- comparison_cross             # to compare binaries for cross-library analysis
 |    |--- random.txt                        # the pre-defined random input values for emulation
 |    |--- Dockerfile                        # the configuration file for Docker
 ```
@@ -155,7 +155,7 @@ The basic configuration of the docker image:
 ##### 1.2 Application: Statically-Linked Library Analysis
 *	Locate the cryptographic functions statically-linked in the target binary.
 	*	TAR: **34** cryptographic functions implemented in **x64_libcrypto111f_gcc114_O3**
-		*	The crypto functions are listed in the file at `(root)/scripts/crypto_func_lst.out`
+		*	The crypto functions are listed in the file at `(root)/data/crypto_func_lst.out`
 	*	REF: **x64_nginx1240_gcc114_O3**
 	```bash
         # only process the 34 crypto functions, time consumption: within 5 seconds
@@ -170,7 +170,7 @@ The basic configuration of the docker image:
 ##### 1.3 Application: Cross-Library Analysis
 *	Identify functions that implement the same cryptographic algorithms.
 	*	REF: **34** cryptographic functions implemented in **x64_libcrypto111f_gcc114_O3**
-		*	The crypto functions are listed in the file at `(root)/scripts/crypto_func_lst.out`
+		*	The crypto functions are listed in the file at `(root)/data/crypto_func_lst.out`
 	*	TAR: **x64_libcl347_gcc114_O0**
     ```bash
     # only process the 34 crypto functions, time consumption: within 5 seconds
