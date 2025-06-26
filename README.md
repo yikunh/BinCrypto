@@ -1,5 +1,3 @@
-@(Artifact)[oopsla'25]
-
 ## BinCrypto: Binary Cryptographic Function Identification via Similarity Analysis with Path-insensitive Emulation
 
 ### Introduction
@@ -180,7 +178,7 @@ The basic configuration of the docker image:
     # time consumption: around 1 second
     $ python3 scripts/compare_binaries.py --reference x64_libcrypto111f_gcc114_O3 --target x64_libcl347_gcc114_O0 --cross
     ```
-*	**libcl** is considered to have 6 functions which implement the same algorithm as **libcrypto**, and 4 of them are correctly identified, as indicated with the latter's function name in the brackets.
+*	**libcl** is found to have 6 functions which implement the same algorithms as **libcrypto**, and 4 of them are correctly identified, as indicated with the latter's function name in the brackets.
 	*	MD5_Update (MD5_Update)
 	*	idea_set_decrypt_key (IDEA_set_decrypt_key)
 	*	idea_set_encrypt_key (IDEA_set_encrypt_key)
