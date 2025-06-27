@@ -3,7 +3,7 @@
 ### Introduction
 *	Here is the artifact of BinCrypto, which aims to identify the cryptographic function in the target binary file via similarity analysis.
 *	It is provided as a Docker image based on Linux, containing the sample binaries and compiled executables of BinCrypto’s prototype.
-*	Since it may take several hours to analyze complex binaries, the artifact uses some relative simpler samples adopted in the paper to present its functionality. The file tree of the artifact is:
+*	Since it may take several hours to analyze complex binaries, the artifact uses relatively simpler samples adopted in the paper to demonstrate its functionality. The file tree of the artifact is:
 ```
 |--- binCrypto/
 |    |--- bin/                              # the directory of binaries
@@ -22,7 +22,7 @@
 |    |    |--- x64_libcl347_gcc114_O3/
 |    |    |--- ...
 |    |--- output/                           # the directory of similarity scores in details
-|	 |--- executables/                      # the directory of executables to emulate and compare binaries
+|    |--- executables/                      # the directory of executables to emulate and compare binaries
 |    |    |--- emulation                    # to generally emulate one binary for code features
 |    |    |--- emulation_cross              # to emulate one binary for cross-library analysis
 |    |    |--- comparison                   # to generally compare two binaries for similarity scores
@@ -95,10 +95,26 @@ The basic configuration of the docker image:
 		*	 The results are considered to be consistent with those in **Table 3** on **Page 17** of the paper.
 		*	It is noteworthy that the results are not exactly the same as those in the paper because the emulation is performed with random values as the input.
 	*	Detailed results are in: `(root)/output/x64_libcl347_gcc114_O3_vs_x64_libcl347_gcc114_O0/`
-		*	**log/**: the directory that stores the similarity score of every REF function comparing to the TAR function, one `.txt` file for each TAR function
+		*	**log/**: the directory that stores the similarity score of every REF function compared to the TAR function, one `.txt` file per TAR function
 			*	Each file is named as that of a TAR function.
 			*	Each line of a file is a REF function and the similarity score with the TAR function.
 			*	For example, 
+			    ```bash
+			    # the similarity scores to compare idea_encrypto of x64_libcl347_gcc114_O3 to all functions of x64_libcl347_gcc114_O0
+			    # the results are sorted in the descending order according to the scores
+			    # finally, the reference function idea_encrypt is correctly matched with the highest score of 0.478273
+			    $ cat ./output/x64_libcl347_gcc114_O3_vs_x64_libcl347_gcc114_O0/log/idea_encrypt.txt | head
+			     idea_encrypt 	 score : 0.478273.
+			     appendContentListItem 	 score : 0.079680.
+			     deleteSessionInfo 	 score : 0.077779.
+			     checkMissingInfo 	 score : 0.069746.
+			     copyPkiUserToCertReq 	 score : 0.062339.
+			     SHA1_Final 	 score : 0.062305.
+			     endTrustInfo 	 score : 0.062241.
+			     ec_GFp_simple_invert 	 score : 0.061729.
+			     deriveTLS12 	 score : 0.055556.
+			     importPKCS1 	 score : 0.055556.
+			    ```
 		*	**false_positives.log**:  false positives of the analysis
 		*	**result.log**: the overview of the analysis results
 		*	**single_match.log**: the TAR functions achieve the single match
@@ -118,7 +134,7 @@ The basic configuration of the docker image:
 			python3 scripts/emulate_binary.py -b x64_libcl347_icx230320_O3 -g
 			python3 scripts/compare_binaries.py -t x64_libcl347_icx230320_O3 -r x64_libcl347_icx230320_O0
 			```
-	*  Cross Compiler Analysis (time consumption: around 120 seconds for each pair of comparison)
+	*  Cross Compiler Analysis
 		*  REF: **x64_libcl347_gcc114_O3**, TAR: **x64_libcl347_clang15_O3**
 		   ```bash
 		   #CMD, time consumption: around 240 seconds in total
@@ -151,7 +167,7 @@ The basic configuration of the docker image:
 	*  The results above are consistent with those in **Table 3** on **Page 17** of the paper.
 
 ##### 1.2 Application: Statically-Linked Library Analysis
-*	Locate the cryptographic functions statically-linked in the target binary.
+*	Locate the statically-linked cryptographic functions.
 	*	TAR: **34** cryptographic functions implemented in **x64_libcrypto111f_gcc114_O3**
 		*	The crypto functions are listed in the file at `(root)/data/crypto_func_lst.out`
 	*	REF: **x64_nginx1240_gcc114_O3**
@@ -193,7 +209,7 @@ The basic configuration of the docker image:
     $ cat ./output/x64_libcl347_gcc114_O0_vs_x64_libcrypto111f_gcc114_O3/log/idea_set_encrypt_key.txt | head
     $ cat ./output/x64_libcl347_gcc114_O0_vs_x64_libcrypto111f_gcc114_O3/log/idea_encrypt.txt | head
     ```
-    *  The results are consistent with those in Figure 8 on Page 20 of the paper.
+    *  The results are consistent with those in **Figure 8** on **Page 20** of the paper.
 
 ##### 1.4 Application: Obfuscated Code Analysis 
 *	Obfuscator-LLVM (OLLVM) is a project provides three typical obfuscation techniques.
@@ -228,7 +244,7 @@ The basic configuration of the docker image:
 	$ python3 scripts/emulate_binary.py --malicious revil --general
 	$ python3 scripts/compare_binaries.py --target x64_libcrypto111f_gcc114_O0 --reference revil
 	```
-*	The AES encryption function is correctly matched with the one at `0x40f35e` of REvil with the highest score of the results (on the first line).
+*	*AES_encrypt* from **libcrypto** is correctly matched to the one at `0x40f35e` in REvil with the highest score of the results (listed on the first line).
 	```bash
 	# check the AES function found in revil
 	$ cat ./output/x64_libcrypto111f_gcc114_O0_vs_revil/log/AES_encrypt.txt | head
@@ -241,4 +257,4 @@ The basic configuration of the docker image:
 	*	In the artifact, only a subset of the sample binaries from the paper is provided, due to the high time and space overhead required to analyze complex samples.
 		*	For example, it would take over 1 hour to analyze **libcrypto**.
 		*	Over 3 hours are needed to handle obfuscated **libcrypto**, and at least 300 GB memory is required to perform the comparison for the current prototype.
-*	To adopt the artifact to new use cases, users need to prepare the preprocess data for the binaries under analysis. The current prototype relies on IDA Pro, which is a commercial tool, to disassemble the binary code and generate the data. According to the description in Section 1, users can also obtain the required data with other disassemblers.
+*	To adopt the artifact to new use cases, users need to prepare the preprocess data for the binaries under analysis. The current prototype relies on IDA Pro, which is a commercial tool, to disassemble the binary code and generate the required data. According to the description in Section 1, users can also obtain the data with other disassemblers.
