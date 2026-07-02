@@ -1,3 +1,5 @@
+@(Artifact)[oopsla'25]
+
 ## BinCrypto: Binary Cryptographic Function Identification via Similarity Analysis with Path-insensitive Emulation
 
 ### Introduction
@@ -22,7 +24,7 @@
 |    |    |--- x64_libcl347_gcc114_O3/
 |    |    |--- ...
 |    |--- output/                           # the directory of similarity scores in details
-|    |--- executables/                      # the directory of executables to emulate and compare binaries
+|	 |--- executables/                      # the directory of executables to emulate and compare binaries
 |    |    |--- emulation                    # to generally emulate one binary for code features
 |    |    |--- emulation_cross              # to emulate one binary for cross-library analysis
 |    |    |--- comparison                   # to generally compare two binaries for similarity scores
@@ -50,8 +52,13 @@ The basic configuration of the docker image:
 ### Step by Step Instructions
 
 #### 1. Reproduction with Sample Binaries
-*	The preprocessing data is generated via [IDA Pro v7.7](https://hex-rays.com/blog/ida-7-7-released) with according [IDAPython](https://github.com/idapython) for automation.
-*	Since the tool is not open, the data is prepared beforehand and placed under `(root)/data` for every function of each binary. For a function **func**, its data includes:
+
+##### 1.0 Preprocessing
+*	In the current artifact, the preprocessing step is implemented based on [Ghidra](https://github.com/nationalsecurityagency/ghidra), an open-source reverse engineering framework. 
+	*	The original BinCrypto artifact used [IDA Pro v7.7](https://hex-rays.com/blog/ida-7-7-released) together with [IDAPython](https://github.com/idapython) scripts to generate the preprocessing data.
+	*	Since IDA Pro is a closed-source commercial tool, the corresponding automation scripts were not released in the original artifact, and the preprocessing data was generated beforehand and placed under `(root)/data`.
+*	The corresponding automation scripts are provided in this repository, so users can regenerate the preprocessing data from the sample binaries or apply the same preprocessing pipeline to new binaries.
+*	The generated preprocessing data follows the same format as the original BinCrypto artifact. For a function **func**, the preprocessing data includes:
 	*	**func-dumpBBOffset**: the address of each basic block
 	*	**func-dumpBBandPredsOffset**: the addresses of predecessors for each basic block
 	*	**func-dumpCheckpoint**:  the addresses of basic blocks that has more than two predecessors
@@ -61,7 +68,16 @@ The basic configuration of the docker image:
 	*	**func-jumpBlock**: the addresses of basic blocks ending with a conditional jump
 	*	**func-loopBackEdge**:  the source and destination addresses of loops' backedges
 	*	**func-negOffsetInMemoryOp**: the absolute values of offsets which are represented in two's complement
-*	The sample binaries are presented unstripped to enhance the readability of the results, while BinCrypto **does not** rely on the symbol and debug information in any way.
+*	For convenience and reproducibility, we also provide the pre-generated preprocessing data under (root)/data for every function of each sample binary.
+*	The sample binaries are presented unstripped to enhance the readability of the results. However, BinCrypto **does not** rely on symbol or debug information in any way.
+*	**Instructions:**
+	*	Fill the path to your local Ghidra's `analyzeHeadless.bat` into the `ghidra_headless` variable in `./preprocess/all_func.py` and fill the Ghidra install directory in `pyghidra.start(install_dir=r"")`.
+	*	Place the binary file into the `./preprocess/Binary/` directory.
+	*	Run the following command in the `./preprocess/` directory to analyze `program`:
+	 ```bash
+		$ python all_func.py program
+	 ```
+	*	After execution, a `program/dump` directory will be generated under `./preprocess/`, containing the analysis results. The analysis logs will be stored in `./preprocess/log/`.
 
 ##### 1.1 Basic Performance
 *	Sample binaries: **x64_libcl347_gcc114_O3** and **x64_libcl347_gcc114_O0**
@@ -172,14 +188,14 @@ The basic configuration of the docker image:
 		*	The crypto functions are listed in the file at `(root)/data/crypto_func_lst.out`
 	*	REF: **x64_nginx1240_gcc114_O3**
 	```bash
-        # only process the 34 crypto functions, time consumption: within 5 seconds
-        $ python3 scripts/emulate_binary.py --static x64_libcrypto111f_gcc114_O3 --crypto
-        # time consumption: around 40 minutes
-        $ python3 scripts/emulate_binary.py --static x64_nginx1240_gcc114_O3 --general
-        # time consumption: around 15 seconds
-        $ python3 scripts/compare_binaries.py --target x64_libcrypto111f_gcc114_O3 --reference x64_nginx1240_gcc114_O3
-        ```
-*  The results are consistent with those in **Table 5** on **Page 20** of the paper.
+  # only process the 34 crypto functions, time consumption: within 5 seconds
+  $ python3 scripts/emulate_binary.py --static x64_libcrypto111f_gcc114_O3 --crypto
+  # time consumption: around 40 minutes
+  $ python3 scripts/emulate_binary.py --static x64_nginx1240_gcc114_O3 --general
+  # time consumption: around 15 seconds
+  $ python3 scripts/compare_binaries.py --target x64_libcrypto111f_gcc114_O3 --reference x64_nginx1240_gcc114_O3
+  ```
+    *  The results are consistent with those in **Table 5** on **Page 20** of the paper.
 
 ##### 1.3 Application: Cross-Library Analysis
 *	Identify functions that implement the same cryptographic algorithms.
